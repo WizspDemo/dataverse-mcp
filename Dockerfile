@@ -21,4 +21,4 @@ ENV PORT=8000
 EXPOSE 8000
 
 # Εκκίνηση: Ο python proxy παίρνει την 8000 και τρέχει τον node server
-CMD ["mcp-proxy", "--port", "8000", "node", "build/index.js"]
+CMD ["sh", "-c", "mcp-proxy --port 8000 node build/index.js"]
