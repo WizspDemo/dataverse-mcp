@@ -1,22 +1,22 @@
 FROM node:20-slim
 
+# Αύξηση ορίου μνήμης για το Node.js κατά το build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 WORKDIR /app
 
-# 1. Αντιγραφή αρχείων και εγκατάσταση εξαρτήσεων
+# 1. Εγκατάσταση μόνο των απαραίτητων
 COPY package*.json ./
-RUN npm install
+RUN npm install --include=dev
 
-# Εγκατάσταση του επίσημου πακέτου για SSE transport
-RUN npm install @modelcontextprotocol/sdk
-
-# 2. Αντιγραφή κώδικα και build
+# 2. Αντιγραφή κώδικα
 COPY . .
+
+# 3. Build με παράκαμψη αυστηρών ελέγχων αν χρειαστεί για εξοικονόμηση μνήμης
 RUN npm run build
 
-# 3. Ρυθμίσεις
+# 4. Ρυθμίσεις και εκκίνηση
 ENV PORT=8000
 EXPOSE 8000
 
-# 4. Εκκίνηση με χρήση του npx για τον επίσημο inspector σε SSE mode
-# Αυτό το εργαλείο είναι πάντα διαθέσιμο
 CMD ["npx", "-y", "@modelcontextprotocol/inspector", "--port", "8000", "--host", "0.0.0.0", "--dangerously-omit-auth", "--", "node", "build/index.js"]
