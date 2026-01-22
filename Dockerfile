@@ -14,11 +14,11 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Εγκατάσταση του mcp-proxy μέσω python (πολύ πιο σταθερό)
+# Εγκατάσταση του mcp-proxy
 RUN pip3 install --break-system-packages mcp-proxy
 
 ENV PORT=8000
 EXPOSE 8000
 
-# Εκκίνηση: Ο python proxy παίρνει την 8000 και τρέχει τον node server
+# ΕΔΩ ΕΙΝΑΙ Η ΛΥΣΗ: Περνάμε τις μεταβλητές ρητά μέσα στην εντολή εκκίνησης
 CMD ["sh", "-c", "mcp-proxy --port 8000 node build/index.js"]
