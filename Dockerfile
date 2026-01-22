@@ -2,22 +2,19 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Αντιγραφή αρχείων ρυθμίσεων
+# 1. Εγκατάσταση του SSE Proxy παγκόσμια
+RUN npm install -g @modelcontextprotocol/inspector
+
+# 2. Αντιγραφή και εγκατάσταση του Dataverse MCP
 COPY package*.json tsconfig.json ./
-
-# Εγκατάσταση εξαρτήσεων
 RUN npm install
-
-# Αντιγραφή κώδικα και Build
 COPY . .
 RUN npm run build
 
-# Ορισμός μεταβλητών μέσα στο Docker για σιγουριά
-ENV MCP_TRANSPORT=sse
+# 3. Ρυθμίσεις δικτύου
 ENV PORT=8000
-
 EXPOSE 8000
 
-# Απευθείας εκτέλεση του build αρχείου με τις παραμέτρους SSE
-# Χρησιμοποιούμε το node απευθείας αντί για npm start
-CMD ["node", "build/index.js", "--transport", "sse", "--port", "8000"]
+# 4. Η "μαγική" εντολή: 
+# Ο proxy ακούει στην 8000 και τρέχει από πίσω τον server σου
+CMD ["npx", "-y", "@modelcontextprotocol/inspector", "node", "build/index.js"]
