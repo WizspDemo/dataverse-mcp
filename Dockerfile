@@ -1,22 +1,24 @@
 FROM node:20-slim
 
-# Αύξηση ορίου μνήμης για το Node.js κατά το build
-ENV NODE_OPTIONS="--max-old-space-size=4096"
+# Εγκατάσταση Python για τον proxy
+RUN apt-get update && apt-get install -y python3 python3-pip && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# 1. Εγκατάσταση μόνο των απαραίτητων
+# Αύξηση μνήμης για το build
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+
 COPY package*.json ./
-RUN npm install --include=dev
+RUN npm install
 
-# 2. Αντιγραφή κώδικα
 COPY . .
-
-# 3. Build με παράκαμψη αυστηρών ελέγχων αν χρειαστεί για εξοικονόμηση μνήμης
 RUN npm run build
 
-# 4. Ρυθμίσεις και εκκίνηση
+# Εγκατάσταση του mcp-proxy μέσω python (πολύ πιο σταθερό)
+RUN pip3 install --break-system-packages mcp-proxy
+
 ENV PORT=8000
 EXPOSE 8000
 
-CMD ["npx", "-y", "@modelcontextprotocol/inspector", "--port", "8000", "--host", "0.0.0.0", "--dangerously-omit-auth", "--", "node", "build/index.js"]
+# Εκκίνηση: Ο python proxy παίρνει την 8000 και τρέχει τον node server
+CMD ["mcp-proxy", "--port", "8000", "node", "build/index.js"]
