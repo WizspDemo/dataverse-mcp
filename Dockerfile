@@ -10,4 +10,5 @@ RUN npm run build
 ENV PORT=8000
 EXPOSE 8000
 # Εκκίνηση
-CMD ["npm", "start", "--", "--transport", "sse", "--port", "8000"]
+#CMD ["npm", "start", "--", "--transport", "sse", "--port", "8000"]
+CMD ["node", "build/index.js", "--transport", "sse", "--port", "8000"]
