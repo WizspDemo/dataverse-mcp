@@ -8,13 +8,12 @@ WORKDIR /app
 # Αντιγραφή όλων των αρχείων
 COPY . .
 
-# Εγκατάσταση εξαρτήσεων
-# Χρησιμοποιούμε το --system για να είναι πιο απλό μέσα στο Docker
+# Εγκατάσταση των εξαρτήσεων απευθείας
 RUN uv pip install --system .
 
 # Ρυθμίσεις δικτύου
 ENV PORT=8000
 EXPOSE 8000
 
-# Εκκίνηση - Χρησιμοποιούμε απευθείας το module
+# Εκκίνηση
 ENTRYPOINT ["python", "-m", "mcp_server_dataverse", "--transport", "sse", "--port", "8000"]
