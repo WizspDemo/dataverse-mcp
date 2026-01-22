@@ -5,21 +5,24 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 WORKDIR /app
 
-# Αντιγραφή ΟΛΩΝ των αρχείων από το repository
+# Αντιγραφή των πάντων από το repository
 COPY . .
 
-# Μετακίνηση στον υποφάκελο όπου βρίσκεται το pyproject.toml
-# Αν ο φάκελος λέγεται dataverse-mcp, μπαίνουμε εκεί
-WORKDIR /app/dataverse-mcp
+# ΕΝΤΟΛΗ DEBUG: Δείξε μας τι υπάρχει μέσα για να ξέρουμε σίγουρα
+RUN echo "Checking directory structure..." && ls -R
 
-# Εγκατάσταση των εξαρτήσεων από το τρέχον σημείο (.)
-RUN uv pip install --system .
-
-# Επιστροφή στο /app για την εκτέλεση
-WORKDIR /app
+# ΕΞΥΠΝΗ ΕΓΚΑΤΑΣΤΑΣΗ: 
+# Ψάχνει το pyproject.toml στη ρίζα ή στον υποφάκελο και εγκαθιστά από εκεί
+RUN if [ -f "pyproject.toml" ]; then \
+        uv pip install --system .; \
+    elif [ -d "dataverse-mcp" ] && [ -f "dataverse-mcp/pyproject.toml" ]; then \
+        cd dataverse-mcp && uv pip install --system .; \
+    else \
+        echo "Error: pyproject.toml not found!" && exit 1; \
+    fi
 
 ENV PORT=8000
 EXPOSE 8000
 
-# Εκκίνηση - Προσαρμοσμένο path για το module
+# Εκκίνηση
 ENTRYPOINT ["python", "-m", "mcp_server_dataverse", "--transport", "sse", "--port", "8000"]
