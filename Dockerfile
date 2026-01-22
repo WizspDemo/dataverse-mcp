@@ -1,22 +1,13 @@
 FROM node:20-slim
-
 WORKDIR /app
-
-# Αντιγραφή των αρχείων ρυθμίσεων
+# Αντιγραφή μόνο των αρχείων ρυθμίσεων για ταχύτητα
 COPY package*.json tsconfig.json ./
-
-# Εγκατάσταση των εξαρτήσεων
 RUN npm install
-
-# Αντιγραφή του υπόλοιπου κώδικα
+# Αντιγραφή όλου του κώδικα
 COPY . .
-
-# Build του TypeScript (αν χρειάζεται)
-RUN npm run build || echo "No build script found, skipping..."
-
+# Δημιουργία των αρχείων JavaScript από το TypeScript
+RUN npm run build
 ENV PORT=8000
 EXPOSE 8000
-
-# Εκκίνηση της εφαρμογής
-# Αν το "main" στο package.json δείχνει στο σωστό αρχείο:
+# Εκκίνηση
 CMD ["npm", "start"]
