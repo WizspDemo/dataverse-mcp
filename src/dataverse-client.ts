@@ -264,6 +264,30 @@ export class DataverseClient {
     return response.data;
   }
 
+  async create(endpoint: string, data?: any): Promise<string> {
+    const response: AxiosResponse = await this.httpClient.post(endpoint, data, {
+      headers: { Prefer: 'return=representation' }
+    });
+    const entityId: string | undefined =
+      response.headers['odata-entityid'] as string | undefined ||
+      response.headers['location'] as string | undefined;
+    if (entityId) {
+      const match = entityId.match(/\(([^)]+)\)$/);
+      if (match) {
+        return match[1];
+      }
+      return entityId;
+    }
+    if (response.data && typeof response.data === 'object') {
+      const keys = Object.keys(response.data);
+      const idKey = keys.find(k => k.endsWith('id') || k === 'id');
+      if (idKey) {
+        return response.data[idKey];
+      }
+    }
+    throw new Error('Failed to extract record ID from response: no OData-EntityId header, Location header, or ID field found in response body.');
+  }
+
   async patch<T = any>(endpoint: string, data?: any): Promise<T> {
     const response: AxiosResponse<T> = await this.httpClient.patch(endpoint, data);
     return response.data;
