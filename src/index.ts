@@ -105,6 +105,9 @@ import {
   convertToAutoNumberTool
 } from "./tools/autonumber-tools.js";
 import {
+  copyRecordTool
+} from "./tools/record-tools.js";
+import {
   registerWebAPIResources
 } from "./resources/webapi-resources.js";
 import {
@@ -243,6 +246,9 @@ setAutoNumberSeedTool(server, dataverseClient);
 getAutoNumberColumnTool(server, dataverseClient);
 listAutoNumberColumnsTool(server, dataverseClient);
 convertToAutoNumberTool(server, dataverseClient);
+
+// Register record copy tool
+copyRecordTool(server, dataverseClient);
 
 // Register WebAPI code generation resources
 registerWebAPIResources(server, dataverseClient);
